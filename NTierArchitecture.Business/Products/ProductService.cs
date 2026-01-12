@@ -53,9 +53,9 @@ public sealed class ProductService(ApplicationDbContext _context)
         await _context.SaveChangesAsync(token);
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(Guid id, CancellationToken token)
     {
-        Product? product = await _context.Products.FindAsync(id) ?? throw new ArgumentException("Product not found");
+        Product? product = await _context.Products.FindAsync(id, token) ?? throw new ArgumentException("Product not found");
         _context.Products.Remove(product);
         await _context.SaveChangesAsync();
     }
