@@ -43,9 +43,9 @@ public sealed class OrderService(ApplicationDbContext _context)
         await _context.SaveChangesAsync(token);
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(Guid id, CancellationToken token)
     {
-        Order? order = await _context.Orders.FindAsync(id) ?? throw new ArgumentException("Order not found");
+        Order? order = await _context.Orders.FindAsync(id, token) ?? throw new ArgumentException("Order not found");
         _context.Orders.Remove(order);
         await _context.SaveChangesAsync();
     }

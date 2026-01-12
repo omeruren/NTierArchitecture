@@ -1,48 +1,50 @@
 ﻿using Carter;
-using NTierArchitecture.Business.Categories;
-using NTierArchitecture.Entity.Dtos.Category;
+using NTierArchitecture.Business.Orders;
+using NTierArchitecture.Entity.Dtos.Orders;
 using NTierArchitecture.Entity.Models;
 
 namespace NTierArchitecture.WebAPI.Modules;
 
-public sealed class CategoryModule : ICarterModule
+public sealed class OrderModule : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder group)
     {
-        var app = group.MapGroup("/categories").WithTags("Categories");
+        var app = group.MapGroup("/orders").WithTags("Orders");
 
         app.MapGet(string.Empty, async (
-            CategoryService _service,
-            CancellationToken token) =>
+            OrderService _service,
+            CancellationToken token
+            ) =>
         {
             var result = await _service.GetAllAsync(token);
             return Results.Ok(result);
-        }).Produces<List<Category>>();
-
+        }).Produces<List<Order>>();
 
         app.MapGet("/{id}", async (
             Guid id,
-            CancellationToken token,
-            CategoryService _service) =>
+            OrderService _service,
+            CancellationToken token
+            ) =>
         {
             var result = await _service.GetAsync(id, token);
             return Results.Ok(result);
-        }).Produces<Category>();
+        }).Produces<Order>();
 
         app.MapPost(string.Empty, async (
-            CategoryCreateDto request,
-            CancellationToken token,
-            CategoryService _service) =>
+            OrderCreateDto request,
+            OrderService _service,
+            CancellationToken token
+            ) =>
         {
             await _service.CreateAsync(request, token);
             return Results.Created();
         });
 
-
         app.MapPut(string.Empty, async (
-            CategoryUpdateDto request,
-            CancellationToken token,
-            CategoryService _service) =>
+            OrderUpdateDto request,
+            OrderService _service,
+            CancellationToken token
+            ) =>
         {
             await _service.UpdateAsync(request, token);
             return Results.Ok();
@@ -50,8 +52,9 @@ public sealed class CategoryModule : ICarterModule
 
         app.MapDelete("/{id}", async (
             Guid id,
-            CancellationToken token,
-            CategoryService _service) =>
+            OrderService _service,
+            CancellationToken token
+            ) =>
         {
             await _service.DeleteAsync(id, token);
             return Results.Ok();
