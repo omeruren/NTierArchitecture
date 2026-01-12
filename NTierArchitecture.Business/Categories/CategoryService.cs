@@ -36,4 +36,19 @@ public sealed class CategoryService(ApplicationDbContext _context)
             .ToListAsync(token);
         return categories;
     }
+
+    public async Task UpdateAsync(CategoryUpdateDto request, CancellationToken token)
+    {
+        Category? category = await _context.Categories.FindAsync(request.Id, token) ?? throw new ArgumentException("Category not found.");
+
+        if (request.Name != category.Name)
+        {
+            bool isExist = await _context.Categories.AnyAsync(c => c.Name == request.Name, token);
+            if (isExist)
+                throw new ArgumentException("Category already exists.");
+        }
+        category.Name = request.Name;
+        _context.Categories.Update(category);
+        await _context.SaveChangesAsync(token);
+    }
 }
