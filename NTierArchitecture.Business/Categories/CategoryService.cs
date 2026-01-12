@@ -1,13 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NTierArchitecture.DataAccess.Context;
-using NTierArchitecture.Entity.Dtos;
+using NTierArchitecture.Entity.Dtos.Category;
 using NTierArchitecture.Entity.Models;
 
 namespace NTierArchitecture.Business.Categories;
 
 public sealed class CategoryService(ApplicationDbContext _context)
 {
-    public async Task CreateAsync(CreateCategoryDto request, CancellationToken token)
+    public async Task CreateAsync(CategoryCreateDto request, CancellationToken token)
     {
         bool isExist = await _context.Categories.AnyAsync(c => c.Name == request.Name, token);
 
