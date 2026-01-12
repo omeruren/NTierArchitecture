@@ -21,4 +21,19 @@ public sealed class CategoryService(ApplicationDbContext _context)
         _context.Categories.Add(category);
         await _context.SaveChangesAsync(token);
     }
+
+    public async Task<Category> GetAsync(Guid id, CancellationToken token)
+    {
+        Category? category = await _context.Categories.FindAsync(id, token) ?? throw new ArgumentException("Category not found.");
+
+        return category;
+    }
+
+    public async Task<List<Category>> GetAllAsync(CancellationToken token)
+    {
+        List<Category> categories = await _context.Categories
+            .OrderBy(c => c.Name)
+            .ToListAsync(token);
+        return categories;
+    }
 }
