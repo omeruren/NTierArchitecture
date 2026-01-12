@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\NTierArchitecture.DataAccess\NTierArchitecture.DataAccess.csproj" />
+    <ProjectReference Include="..\NTierArchitecture.Entity\NTierArchitecture.Entity.csproj" />
+  </ItemGroup>
+
 </Project>
