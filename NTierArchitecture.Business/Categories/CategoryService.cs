@@ -51,4 +51,11 @@ public sealed class CategoryService(ApplicationDbContext _context)
         _context.Categories.Update(category);
         await _context.SaveChangesAsync(token);
     }
+
+    public async Task DeleteAsync(Guid id, CancellationToken token)
+    {
+        Category? category = await _context.Categories.FindAsync(id, token) ?? throw new ArgumentException("Category not found.");
+        _context.Categories.Remove(category);
+        await _context.SaveChangesAsync(token);
+    }
 }
