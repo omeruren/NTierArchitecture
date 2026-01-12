@@ -31,10 +31,9 @@ public sealed class CategoryService(ApplicationDbContext _context)
 
     public async Task<List<Category>> GetAllAsync(CancellationToken token)
     {
-        List<Category> categories = await _context.Categories
-            .OrderBy(c => c.Name)
-            .ToListAsync(token);
-        return categories;
+        return await _context.Categories
+             .OrderBy(c => c.Name)
+             .ToListAsync(token);
     }
 
     public async Task UpdateAsync(CategoryUpdateDto request, CancellationToken token)
