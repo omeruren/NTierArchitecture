@@ -2,4 +2,5 @@
   <Project Path="NTierArchitecture.Business/NTierArchitecture.Business.csproj" />
   <Project Path="NTierArchitecture.DataAccess/NTierArchitecture.DataAccess.csproj" />
   <Project Path="NTierArchitecture.Entity/NTierArchitecture.Entity.csproj" />
+  <Project Path="NTierArchitecture.WebAPI/NTierArchitecture.WebAPI.csproj" />
 </Solution>
