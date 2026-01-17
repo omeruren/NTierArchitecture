@@ -11,7 +11,7 @@ public static class BusinessRegistrar
     public static IServiceCollection AddBusiness(this IServiceCollection services)
     {
         // Register business services here
-
+        services.AddMemoryCache();
         services.AddTransient<CategoryService>();
         services.AddTransient<ProductService>();
         services.AddTransient<OrderService>();

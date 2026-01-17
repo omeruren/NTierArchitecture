@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using NTierArchitecture.DataAccess.Context;
 using NTierArchitecture.Entity.Dtos.Category;
 using NTierArchitecture.Entity.Models;
@@ -7,7 +8,7 @@ using TS.Result;
 
 namespace NTierArchitecture.Business.Categories;
 
-public sealed class CategoryService(ApplicationDbContext _context)
+public sealed class CategoryService(ApplicationDbContext _context, IMemoryCache _memoryCache)
 {
     public async Task<Result<string>> CreateAsync(CategoryCreateDto request, CancellationToken token)
     {
@@ -31,9 +32,16 @@ public sealed class CategoryService(ApplicationDbContext _context)
 
     public async Task<Result<List<Category>>> GetAllAsync(CancellationToken token)
     {
-        return await _context.Categories
-             .OrderBy(c => c.Name)
-             .ToListAsync(token);
+        var categories = _memoryCache.Get<List<Category>>("categories");
+
+        if (categories is null)
+        {
+            categories = await _context.Categories
+                     .OrderBy(c => c.Name).ToListAsync(token);
+
+            _memoryCache.Set("categories", categories);
+        }
+        return categories;
     }
 
     public async Task<Result<string>> UpdateAsync(CategoryUpdateDto request, CancellationToken token)
