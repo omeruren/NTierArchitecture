@@ -18,8 +18,17 @@ public class ValidationFilter<T> : IEndpointFilter
         if (!result.IsValid)
         {
             var errors = result.Errors.GroupBy(e => e.PropertyName).ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
-            return Results.ValidationProblem(errors);
+            throw new ValidationExceptionEx(errors);
         }
         return await next(context);
+    }
+}
+public sealed class ValidationExceptionEx : Exception
+{
+    public IDictionary<string, string[]> Errors { get; }
+
+    public ValidationExceptionEx(IDictionary<string, string[]> errors) : base("Validation Failed")
+    {
+        Errors = errors;
     }
 }
