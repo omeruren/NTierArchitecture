@@ -1,6 +1,7 @@
 ﻿using Carter;
 using NTierArchitecture.Business.Orders;
 using NTierArchitecture.Entity.Dtos.Orders;
+using NTierArchitecture.Entity.Dtos.Pagination;
 using NTierArchitecture.WebAPI.Filters;
 using TS.Result;
 
@@ -16,10 +17,14 @@ public sealed class OrderModule : ICarterModule
 
         app.MapGet(string.Empty, async (
             OrderService _service,
-            CancellationToken token
+            int pageNumber = 1,
+            int pageSize = 5,
+            string search = "",
+            CancellationToken token = default
             ) =>
         {
-            var result = await _service.GetAllAsync(token);
+            var paginationResponse = new PaginationRequestDto(pageNumber, pageSize, search);
+            var result = await _service.GetAllAsync(paginationResponse, token);
             return Results.Ok(result);
         }).Produces<Result<List<OrderResponseDto>>>();
 

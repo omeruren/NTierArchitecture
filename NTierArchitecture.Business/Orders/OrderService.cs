@@ -1,7 +1,9 @@
 ﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
+using NTierArchitecture.Business.Abstractions;
 using NTierArchitecture.DataAccess.Context;
 using NTierArchitecture.Entity.Dtos.Orders;
+using NTierArchitecture.Entity.Dtos.Pagination;
 using NTierArchitecture.Entity.Models;
 using TS.Result;
 
@@ -40,7 +42,7 @@ public sealed class OrderService(ApplicationDbContext _context)
 
         return order;
     }
-    public async Task<Result<List<OrderResponseDto>>> GetAllAsync(CancellationToken token)
+    public async Task<Result<PaginationResponseDto<OrderResponseDto>>> GetAllAsync(PaginationRequestDto request, CancellationToken token)
     {
         return await _context.Orders
             .LeftJoin(_context.Products, o => o.ProductId, o => o.Id, (order, product) => new { order, product })
@@ -57,7 +59,7 @@ public sealed class OrderService(ApplicationDbContext _context)
                 DeletedAt = s.product.DeletedAt
             })
             .OrderBy(o => o.OrderDate)
-            .ToListAsync(token);
+            .Pagination(request, token);
     }
 
     public async Task<Result<string>> UpdateAsync(OrderUpdateDto request, CancellationToken token)

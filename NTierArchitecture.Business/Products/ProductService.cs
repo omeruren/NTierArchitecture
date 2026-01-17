@@ -1,6 +1,8 @@
 ﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
+using NTierArchitecture.Business.Abstractions;
 using NTierArchitecture.DataAccess.Context;
+using NTierArchitecture.Entity.Dtos.Pagination;
 using NTierArchitecture.Entity.Dtos.Products;
 using NTierArchitecture.Entity.Models;
 using TS.Result;
@@ -41,23 +43,27 @@ public sealed class ProductService(ApplicationDbContext _context)
             .FirstOrDefaultAsync(token) ?? throw new ArgumentException("Product not found");
         return product;
     }
-    public async Task<Result<List<ProductResultDto>>> GetAllAsync(CancellationToken token)
+    public async Task<Result<PaginationResponseDto<ProductResultDto>>> GetAllAsync(PaginationRequestDto request, CancellationToken token)
     {
         return await _context.Products
-            .LeftJoin(_context.Categories, p => p.CategoryId, p => p.Id, (product, category) => new { product, category })
-            .Select(s => new ProductResultDto
-            {
-                Id = s.product.Id,
-                Name = s.product.Name,
-                CategoryName = s.category!.Name,
-                UnitPrice = s.product.UnitPrice,
-                CreatedAt = s.product.CreatedAt,
-                UpdatedAt = s.product.UpdatedAt,
-                IsDeleted = s.product.IsDeleted,
-                DeletedAt = s.product.DeletedAt
-            })
-            .OrderBy(p => p.Name)
-            .ToListAsync(token);
+             .Where(p => p.Name.Contains(request.Search))
+             .LeftJoin(_context.Categories, p => p.CategoryId, p => p.Id, (product, category) => new { product, category })
+             .Select(s => new ProductResultDto
+             {
+                 Id = s.product.Id,
+                 Name = s.product.Name,
+                 CategoryName = s.category!.Name,
+                 CategoryId = s.product.CategoryId,
+                 UnitPrice = s.product.UnitPrice,
+                 CreatedAt = s.product.CreatedAt,
+                 UpdatedAt = s.product.UpdatedAt,
+                 IsDeleted = s.product.IsDeleted,
+                 DeletedAt = s.product.DeletedAt
+             })
+             .OrderBy(p => p.Name)
+             .Pagination(request, token);
+
+
     }
 
     public async Task<Result<string>> UpdateAsync(ProductUpdateDto request, CancellationToken token)

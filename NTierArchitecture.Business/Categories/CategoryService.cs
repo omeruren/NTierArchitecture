@@ -1,8 +1,10 @@
 ﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using NTierArchitecture.Business.Abstractions;
 using NTierArchitecture.DataAccess.Context;
 using NTierArchitecture.Entity.Dtos.Category;
+using NTierArchitecture.Entity.Dtos.Pagination;
 using NTierArchitecture.Entity.Models;
 using TS.Result;
 
@@ -31,14 +33,14 @@ public sealed class CategoryService(ApplicationDbContext _context, IMemoryCache 
         return category;
     }
 
-    public async Task<Result<List<Category>>> GetAllAsync(CancellationToken token)
+    public async Task<Result<PaginationResponseDto<Category>>> GetAllAsync(PaginationRequestDto request, CancellationToken token)
     {
-        var categories = _memoryCache.Get<List<Category>>("categories");
+        var categories = _memoryCache.Get<PaginationResponseDto<Category>>("categories");
 
         if (categories is null)
         {
             categories = await _context.Categories
-                     .OrderBy(c => c.Name).ToListAsync(token);
+                     .OrderBy(c => c.Name).Pagination(request, token);
 
             _memoryCache.Set("categories", categories);
         }

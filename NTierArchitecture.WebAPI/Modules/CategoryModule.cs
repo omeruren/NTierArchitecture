@@ -1,6 +1,7 @@
 ﻿using Carter;
 using NTierArchitecture.Business.Categories;
 using NTierArchitecture.Entity.Dtos.Category;
+using NTierArchitecture.Entity.Dtos.Pagination;
 using NTierArchitecture.Entity.Models;
 using NTierArchitecture.WebAPI.Filters;
 using TS.Result;
@@ -16,9 +17,13 @@ public sealed class CategoryModule : ICarterModule
         // GET ALL
         app.MapGet(string.Empty, async (
             CategoryService _service,
-            CancellationToken token) =>
+            int pageNumber = 1,
+            int pageSize = 5,
+            string search = "",
+            CancellationToken token = default) =>
         {
-            var result = await _service.GetAllAsync(token);
+            var paginationResponse = new PaginationRequestDto(pageNumber, pageSize, search);
+            var result = await _service.GetAllAsync(paginationResponse, token);
             return Results.Ok(result);
         }).Produces<Result<List<Category>>>();
 
