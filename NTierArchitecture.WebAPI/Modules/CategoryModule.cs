@@ -2,6 +2,7 @@
 using NTierArchitecture.Business.Categories;
 using NTierArchitecture.Entity.Dtos.Category;
 using NTierArchitecture.Entity.Models;
+using NTierArchitecture.WebAPI.Filters;
 
 namespace NTierArchitecture.WebAPI.Modules;
 
@@ -36,7 +37,7 @@ public sealed class CategoryModule : ICarterModule
         {
             await _service.CreateAsync(request, token);
             return Results.Created();
-        });
+        }).AddEndpointFilter<ValidationFilter<CategoryCreateDto>>();
 
 
         app.MapPut(string.Empty, async (
@@ -46,7 +47,7 @@ public sealed class CategoryModule : ICarterModule
         {
             await _service.UpdateAsync(request, token);
             return Results.Ok();
-        });
+        }).AddEndpointFilter<ValidationFilter<CategoryUpdateDto>>();
 
         app.MapDelete("/{id}", async (
             Guid id,

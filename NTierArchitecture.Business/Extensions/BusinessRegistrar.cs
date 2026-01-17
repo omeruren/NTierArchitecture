@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
 using NTierArchitecture.Business.Categories;
 using NTierArchitecture.Business.Orders;
 using NTierArchitecture.Business.Products;
@@ -14,7 +15,7 @@ public static class BusinessRegistrar
         services.AddTransient<CategoryService>();
         services.AddTransient<ProductService>();
         services.AddTransient<OrderService>();
-
+        services.AddValidatorsFromAssembly(typeof(BusinessRegistrar).Assembly);
         return services;
     }
 }

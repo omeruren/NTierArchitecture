@@ -2,6 +2,7 @@
 using NTierArchitecture.Business.Products;
 using NTierArchitecture.Entity.Dtos.Products;
 using NTierArchitecture.Entity.Models;
+using NTierArchitecture.WebAPI.Filters;
 
 namespace NTierArchitecture.WebAPI.Modules;
 
@@ -36,7 +37,7 @@ public class ProductModule : ICarterModule
         {
             await _service.CreateAsync(request, token);
             return Results.Created();
-        });
+        }).AddEndpointFilter<ValidationFilter<ProductCreateDto>>();
 
         app.MapPut(string.Empty, async (
             ProductService _service,
@@ -45,7 +46,7 @@ public class ProductModule : ICarterModule
         {
             await _service.UpdateAsync(request, token);
             return Results.Ok();
-        });
+        }).AddEndpointFilter<ValidationFilter<ProductUpdateDto>>();
 
         app.MapDelete("/{id}", async (
             Guid id,

@@ -2,6 +2,7 @@
 using NTierArchitecture.Business.Orders;
 using NTierArchitecture.Entity.Dtos.Orders;
 using NTierArchitecture.Entity.Models;
+using NTierArchitecture.WebAPI.Filters;
 
 namespace NTierArchitecture.WebAPI.Modules;
 
@@ -38,7 +39,7 @@ public sealed class OrderModule : ICarterModule
         {
             await _service.CreateAsync(request, token);
             return Results.Created();
-        });
+        }).AddEndpointFilter<ValidationFilter<OrderCreateDto>>();
 
         app.MapPut(string.Empty, async (
             OrderUpdateDto request,
@@ -48,7 +49,7 @@ public sealed class OrderModule : ICarterModule
         {
             await _service.UpdateAsync(request, token);
             return Results.Ok();
-        });
+        }).AddEndpointFilter<ValidationFilter<OrderUpdateDto>>();
 
         app.MapDelete("/{id}", async (
             Guid id,

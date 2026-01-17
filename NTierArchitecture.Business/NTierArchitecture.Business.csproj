@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\NTierArchitecture.DataAccess\NTierArchitecture.DataAccess.csproj" />
     <ProjectReference Include="..\NTierArchitecture.Entity\NTierArchitecture.Entity.csproj" />
   </ItemGroup>
