@@ -20,6 +20,7 @@ public sealed class CategoryService(ApplicationDbContext _context, IMemoryCache 
         Category category = request.Adapt<Category>();
         _context.Categories.Add(category);
         await _context.SaveChangesAsync(token);
+        _memoryCache.Remove("categories");
         return "Category Created Successfully.";
     }
 
@@ -59,6 +60,8 @@ public sealed class CategoryService(ApplicationDbContext _context, IMemoryCache 
 
         _context.Categories.Update(category);
         await _context.SaveChangesAsync(token);
+        _memoryCache.Remove("categories");
+
         return "Category Updated Successfully.";
 
     }
