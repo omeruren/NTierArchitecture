@@ -21,15 +21,41 @@ public sealed class ProductService(ApplicationDbContext _context)
         return "Product Created Successfully";
     }
 
-    public async Task<Result<Product>> GetAsync(Guid id, CancellationToken token)
+    public async Task<Result<ProductResultDto>> GetAsync(Guid id, CancellationToken token)
     {
-        Product? product = await _context.Products.FindAsync(id, token) ?? throw new ArgumentException("Product not found");
-
+        ProductResultDto? product = await _context.Products.
+            Where(p => p.Id == id)
+            .LeftJoin(_context.Categories, p => p.CategoryId, p => p.Id, (product, category) => new { product, category })
+            .Select(s => new ProductResultDto
+            {
+                Id = s.product.Id,
+                Name = s.product.Name,
+                CategoryId = s.product.CategoryId,
+                CategoryName = s.category!.Name,
+                UnitPrice = s.product.UnitPrice,
+                CreatedAt = s.product.CreatedAt,
+                UpdatedAt = s.product.UpdatedAt,
+                IsDeleted = s.product.IsDeleted,
+                DeletedAt = s.product.DeletedAt,
+            })
+            .FirstOrDefaultAsync(token) ?? throw new ArgumentException("Product not found");
         return product;
     }
-    public async Task<Result<List<Product>>> GetAllAsync(CancellationToken token)
+    public async Task<Result<List<ProductResultDto>>> GetAllAsync(CancellationToken token)
     {
         return await _context.Products
+            .LeftJoin(_context.Categories, p => p.CategoryId, p => p.Id, (product, category) => new { product, category })
+            .Select(s => new ProductResultDto
+            {
+                Id = s.product.Id,
+                Name = s.product.Name,
+                CategoryName = s.category!.Name,
+                UnitPrice = s.product.UnitPrice,
+                CreatedAt = s.product.CreatedAt,
+                UpdatedAt = s.product.UpdatedAt,
+                IsDeleted = s.product.IsDeleted,
+                DeletedAt = s.product.DeletedAt
+            })
             .OrderBy(p => p.Name)
             .ToListAsync(token);
     }

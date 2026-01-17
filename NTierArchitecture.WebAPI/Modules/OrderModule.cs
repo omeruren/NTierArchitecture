@@ -1,8 +1,8 @@
 ﻿using Carter;
 using NTierArchitecture.Business.Orders;
 using NTierArchitecture.Entity.Dtos.Orders;
-using NTierArchitecture.Entity.Models;
 using NTierArchitecture.WebAPI.Filters;
+using TS.Result;
 
 namespace NTierArchitecture.WebAPI.Modules;
 
@@ -12,6 +12,8 @@ public sealed class OrderModule : ICarterModule
     {
         var app = group.MapGroup("/orders").WithTags("Orders");
 
+        // GET ALL
+
         app.MapGet(string.Empty, async (
             OrderService _service,
             CancellationToken token
@@ -19,7 +21,9 @@ public sealed class OrderModule : ICarterModule
         {
             var result = await _service.GetAllAsync(token);
             return Results.Ok(result);
-        }).Produces<List<Order>>();
+        }).Produces<Result<List<OrderResponseDto>>>();
+
+        // GET BY ID
 
         app.MapGet("/{id}", async (
             Guid id,
@@ -29,7 +33,9 @@ public sealed class OrderModule : ICarterModule
         {
             var result = await _service.GetAsync(id, token);
             return Results.Ok(result);
-        }).Produces<Order>();
+        }).Produces<Result<OrderResponseDto>>();
+
+        // POST
 
         app.MapPost(string.Empty, async (
             OrderCreateDto request,
@@ -39,7 +45,9 @@ public sealed class OrderModule : ICarterModule
         {
             var result = await _service.CreateAsync(request, token);
             return Results.Ok(result);
-        }).AddEndpointFilter<ValidationFilter<OrderCreateDto>>();
+        }).Produces<Result<string>>().AddEndpointFilter<ValidationFilter<OrderCreateDto>>();
+
+        // PUT
 
         app.MapPut(string.Empty, async (
             OrderUpdateDto request,
@@ -49,7 +57,9 @@ public sealed class OrderModule : ICarterModule
         {
             var result = await _service.UpdateAsync(request, token);
             return Results.Ok(result);
-        }).AddEndpointFilter<ValidationFilter<OrderUpdateDto>>();
+        }).Produces<Result<string>>().AddEndpointFilter<ValidationFilter<OrderUpdateDto>>();
+
+        // DELETE 
 
         app.MapDelete("/{id}", async (
             Guid id,
@@ -59,6 +69,6 @@ public sealed class OrderModule : ICarterModule
         {
             var result = await _service.DeleteAsync(id, token);
             return Results.Ok(result);
-        });
+        }).Produces<Result<string>>();
     }
 }

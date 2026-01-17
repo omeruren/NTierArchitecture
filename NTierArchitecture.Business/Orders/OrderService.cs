@@ -18,15 +18,45 @@ public sealed class OrderService(ApplicationDbContext _context)
         return "Order Created Successfully.";
     }
 
-    public async Task<Result<Order>> GetAsync(Guid id, CancellationToken token)
+    public async Task<Result<OrderResponseDto>> GetAsync(Guid id, CancellationToken token)
     {
-        Order? order = await _context.Orders.FindAsync(id, token) ?? throw new ArgumentException("Order not found");
+        OrderResponseDto? order = await _context.Orders
+            .Where(o => o.Id == id)
+            .LeftJoin(_context.Products, o => o.ProductId, o => o.Id, (order, product) => new { order, product })
+            .Select(s => new OrderResponseDto
+            {
+                Id = s.order.Id,
+                OrderDate = s.order.OrderDate,
+                Quantity = s.order.Quantity,
+                ProductId = s.order.ProductId,
+                ProductName = s.product!.Name,
+                CreatedAt = s.product.CreatedAt,
+                UpdatedAt = s.product.UpdatedAt,
+                IsDeleted = s.product.IsDeleted,
+                DeletedAt = s.product.DeletedAt
+
+            })
+            .FirstOrDefaultAsync(token) ?? throw new ArgumentException("Order not found");
 
         return order;
     }
-    public async Task<Result<List<Order>>> GetAllAsync(CancellationToken token)
+    public async Task<Result<List<OrderResponseDto>>> GetAllAsync(CancellationToken token)
     {
         return await _context.Orders
+            .LeftJoin(_context.Products, o => o.ProductId, o => o.Id, (order, product) => new { order, product })
+            .Select(s => new OrderResponseDto
+            {
+                Id = s.order.Id,
+                OrderDate = s.order.OrderDate,
+                Quantity = s.order.Quantity,
+                ProductId = s.order.ProductId,
+                ProductName = s.product!.Name,
+                CreatedAt = s.product.CreatedAt,
+                UpdatedAt = s.product.UpdatedAt,
+                IsDeleted = s.product.IsDeleted,
+                DeletedAt = s.product.DeletedAt
+            })
+            .OrderBy(o => o.OrderDate)
             .ToListAsync(token);
     }
 
