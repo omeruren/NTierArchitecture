@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Mapster;
+using Microsoft.EntityFrameworkCore;
 using NTierArchitecture.DataAccess.Context;
 using NTierArchitecture.Entity.Dtos.Products;
 using NTierArchitecture.Entity.Models;
@@ -13,12 +14,8 @@ public sealed class ProductService(ApplicationDbContext _context)
         bool isExist = await _context.Products.AnyAsync(p => p.Name == request.Name, token);
         if (isExist)
             throw new ArgumentException("Product is already exist");
-        Product product = new()
-        {
-            Name = request.Name,
-            UnitPrice = request.UnitPrice,
-            CategoryId = request.CategoryId
-        };
+
+        Product product = request.Adapt<Product>();
         _context.Products.Add(product);
         await _context.SaveChangesAsync(token);
         return "Product Created Successfully";
@@ -47,9 +44,8 @@ public sealed class ProductService(ApplicationDbContext _context)
             if (isExist)
                 throw new ArgumentException("Product is already exist");
         }
-        product.Name = request.Name;
-        product.UnitPrice = request.UnitPrice;
-        product.CategoryId = request.CategoryId;
+
+        request.Adapt(product);
 
         _context.Products.Update(product);
         await _context.SaveChangesAsync(token);

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Mapster;
+using Microsoft.EntityFrameworkCore;
 using NTierArchitecture.DataAccess.Context;
 using NTierArchitecture.Entity.Dtos.Category;
 using NTierArchitecture.Entity.Models;
@@ -15,10 +16,7 @@ public sealed class CategoryService(ApplicationDbContext _context)
         if (isExist)
             throw new ArgumentException("Category already exists.");
 
-        Category category = new()
-        {
-            Name = request.Name
-        };
+        Category category = request.Adapt<Category>();
         _context.Categories.Add(category);
         await _context.SaveChangesAsync(token);
         return "Category Created Successfully.";
@@ -48,7 +46,9 @@ public sealed class CategoryService(ApplicationDbContext _context)
             if (isExist)
                 throw new ArgumentException("Category already exists.");
         }
-        category.Name = request.Name;
+
+        request.Adapt(category);
+
         _context.Categories.Update(category);
         await _context.SaveChangesAsync(token);
         return "Category Updated Successfully.";

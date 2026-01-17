@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Mapster;
+using Microsoft.EntityFrameworkCore;
 using NTierArchitecture.DataAccess.Context;
 using NTierArchitecture.Entity.Dtos.Orders;
 using NTierArchitecture.Entity.Models;
@@ -11,12 +12,7 @@ public sealed class OrderService(ApplicationDbContext _context)
     public async Task<Result<string>> CreateAsync(OrderCreateDto request, CancellationToken token)
     {
 
-        Order order = new()
-        {
-            ProductId = request.ProductId,
-            Quantity = request.Quantity,
-            OrderDate = DateTimeOffset.Now
-        };
+        Order order = request.Adapt<Order>();
         _context.Orders.Add(order);
         await _context.SaveChangesAsync(token);
         return "Order Created Successfully.";
@@ -38,8 +34,7 @@ public sealed class OrderService(ApplicationDbContext _context)
     {
         Order? order = await _context.Orders.FindAsync(request.Id, token) ?? throw new ArgumentException("Order not found");
 
-        order.ProductId = request.ProductId;
-        order.Quantity = request.Quantity;
+        request.Adapt(order);
 
         _context.Orders.Update(order);
         await _context.SaveChangesAsync(token);
