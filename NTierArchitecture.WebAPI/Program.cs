@@ -13,10 +13,20 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddExceptionHandler<ExceptionHandler>().AddProblemDetails();
 
+builder.Services.AddCors();
+
 var app = builder.Build();
 
 app.MapOpenApi();
 app.MapScalarApiReference();
+
+app.UseCors(x => x
+    .AllowAnyMethod()
+    .AllowAnyOrigin()
+    .AllowAnyHeader()
+    .SetPreflightMaxAge(TimeSpan.FromMinutes(10))
+);
+
 app.UseExceptionHandler();
 
 app.MapCarter();
