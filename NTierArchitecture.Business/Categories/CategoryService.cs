@@ -2,12 +2,13 @@
 using NTierArchitecture.DataAccess.Context;
 using NTierArchitecture.Entity.Dtos.Category;
 using NTierArchitecture.Entity.Models;
+using TS.Result;
 
 namespace NTierArchitecture.Business.Categories;
 
 public sealed class CategoryService(ApplicationDbContext _context)
 {
-    public async Task CreateAsync(CategoryCreateDto request, CancellationToken token)
+    public async Task<Result<string>> CreateAsync(CategoryCreateDto request, CancellationToken token)
     {
         bool isExist = await _context.Categories.AnyAsync(c => c.Name == request.Name, token);
 
@@ -20,23 +21,24 @@ public sealed class CategoryService(ApplicationDbContext _context)
         };
         _context.Categories.Add(category);
         await _context.SaveChangesAsync(token);
+        return "Category Created Successfully.";
     }
 
-    public async Task<Category> GetAsync(Guid id, CancellationToken token)
+    public async Task<Result<Category>> GetAsync(Guid id, CancellationToken token)
     {
         Category? category = await _context.Categories.FindAsync(id, token) ?? throw new ArgumentException("Category not found.");
 
         return category;
     }
 
-    public async Task<List<Category>> GetAllAsync(CancellationToken token)
+    public async Task<Result<List<Category>>> GetAllAsync(CancellationToken token)
     {
         return await _context.Categories
              .OrderBy(c => c.Name)
              .ToListAsync(token);
     }
 
-    public async Task UpdateAsync(CategoryUpdateDto request, CancellationToken token)
+    public async Task<Result<string>> UpdateAsync(CategoryUpdateDto request, CancellationToken token)
     {
         Category? category = await _context.Categories.FindAsync(request.Id, token) ?? throw new ArgumentException("Category not found.");
 
@@ -49,12 +51,16 @@ public sealed class CategoryService(ApplicationDbContext _context)
         category.Name = request.Name;
         _context.Categories.Update(category);
         await _context.SaveChangesAsync(token);
+        return "Category Updated Successfully.";
+
     }
 
-    public async Task DeleteAsync(Guid id, CancellationToken token)
+    public async Task<Result<string>> DeleteAsync(Guid id, CancellationToken token)
     {
         Category? category = await _context.Categories.FindAsync(id, token) ?? throw new ArgumentException("Category not found.");
         _context.Categories.Remove(category);
         await _context.SaveChangesAsync(token);
+        return "Category Deleted Successfully.";
+
     }
 }

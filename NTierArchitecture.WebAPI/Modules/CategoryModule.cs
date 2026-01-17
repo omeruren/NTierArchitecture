@@ -35,8 +35,8 @@ public sealed class CategoryModule : ICarterModule
             CancellationToken token,
             CategoryService _service) =>
         {
-            await _service.CreateAsync(request, token);
-            return Results.Created();
+            var result = await _service.CreateAsync(request, token);
+            return Results.Ok(result);
         }).AddEndpointFilter<ValidationFilter<CategoryCreateDto>>();
 
 
@@ -45,8 +45,8 @@ public sealed class CategoryModule : ICarterModule
             CancellationToken token,
             CategoryService _service) =>
         {
-            await _service.UpdateAsync(request, token);
-            return Results.Ok();
+            var result = await _service.UpdateAsync(request, token);
+            return Results.Ok(result);
         }).AddEndpointFilter<ValidationFilter<CategoryUpdateDto>>();
 
         app.MapDelete("/{id}", async (
@@ -54,8 +54,8 @@ public sealed class CategoryModule : ICarterModule
             CancellationToken token,
             CategoryService _service) =>
         {
-            await _service.DeleteAsync(id, token);
-            return Results.Ok();
+            var result = await _service.DeleteAsync(id, token);
+            return Results.Ok(result);
         });
     }
 }

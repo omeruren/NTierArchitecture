@@ -37,8 +37,8 @@ public sealed class OrderModule : ICarterModule
             CancellationToken token
             ) =>
         {
-            await _service.CreateAsync(request, token);
-            return Results.Created();
+            var result = await _service.CreateAsync(request, token);
+            return Results.Ok(result);
         }).AddEndpointFilter<ValidationFilter<OrderCreateDto>>();
 
         app.MapPut(string.Empty, async (
@@ -47,8 +47,8 @@ public sealed class OrderModule : ICarterModule
             CancellationToken token
             ) =>
         {
-            await _service.UpdateAsync(request, token);
-            return Results.Ok();
+            var result = await _service.UpdateAsync(request, token);
+            return Results.Ok(result);
         }).AddEndpointFilter<ValidationFilter<OrderUpdateDto>>();
 
         app.MapDelete("/{id}", async (
@@ -57,8 +57,8 @@ public sealed class OrderModule : ICarterModule
             CancellationToken token
             ) =>
         {
-            await _service.DeleteAsync(id, token);
-            return Results.Ok();
+            var result = await _service.DeleteAsync(id, token);
+            return Results.Ok(result);
         });
     }
 }

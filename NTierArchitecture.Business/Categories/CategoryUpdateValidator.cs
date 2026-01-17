@@ -7,7 +7,6 @@ public sealed class CategoryUpdateValidator : AbstractValidator<CategoryUpdateDt
 {
     public CategoryUpdateValidator()
     {
-        RuleFor(c => c.Name).NotEmpty().WithMessage("Kategori adı boş kalamaz.");
-
+        RuleFor(c => c.Name).NotEmpty().WithMessage("Category Name is required.");
     }
 }

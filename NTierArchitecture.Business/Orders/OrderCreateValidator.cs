@@ -7,7 +7,6 @@ public sealed class OrderCreateValidator : AbstractValidator<OrderCreateDto>
 {
     public OrderCreateValidator()
     {
-        RuleFor(p => p.Quantity).GreaterThan(0).WithMessage("Sipariş adedi 0 dan büyük olmalıdır.");
-
+        RuleFor(p => p.Quantity).GreaterThan(0).WithMessage("Order quantity must be greater than 0.");
     }
 }
