@@ -12,7 +12,7 @@ public class ProductModule : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder group)
     {
-        var app = group.MapGroup("/products").WithTags("Products");
+        var app = group.MapGroup("/products").WithTags("Products").RequireRateLimiting("fixed");
 
         // GET ALL
 

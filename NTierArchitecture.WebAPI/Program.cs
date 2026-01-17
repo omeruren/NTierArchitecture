@@ -1,5 +1,6 @@
 
 using Carter;
+using Microsoft.AspNetCore.RateLimiting;
 using NTierArchitecture.Business.Extensions;
 using NTierArchitecture.DataAccess.Extensions;
 using NTierArchitecture.WebAPI;
@@ -17,6 +18,17 @@ builder.Services.AddCors();
 
 builder.Services.AddResponseCompression(x => x.EnableForHttps = true);
 
+builder.Services.AddRateLimiter(x =>
+{
+    x.AddFixedWindowLimiter("fixed", cfr =>
+    {
+        cfr.PermitLimit = 5;
+        cfr.Window = TimeSpan.FromSeconds(10);
+        cfr.QueueLimit = 3;
+        cfr.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+    });
+});
+
 var app = builder.Build();
 
 app.MapOpenApi();
@@ -32,6 +44,9 @@ app.UseCors(x => x
 app.UseResponseCompression();
 
 app.UseExceptionHandler();
+
+
+app.UseRateLimiter();
 
 app.MapCarter();
 app.Run();

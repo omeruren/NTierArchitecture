@@ -12,7 +12,7 @@ public sealed class CategoryModule : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder group)
     {
-        var app = group.MapGroup("/categories").WithTags("Categories");
+        var app = group.MapGroup("/categories").WithTags("Categories").RequireRateLimiting("fixed");
 
         // GET ALL
         app.MapGet(string.Empty, async (
