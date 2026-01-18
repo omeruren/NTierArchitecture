@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NTierArchitecture.DataAccess.Context;
+using NTierArchitecture.Entity.Models;
 
 namespace NTierArchitecture.DataAccess.Extensions;
 
@@ -13,6 +14,11 @@ public static class DataAccessRegistrar
         {
             opt.UseSqlServer(configuration.GetConnectionString("SqlServer"));
         });
+        services.AddIdentityCore<User>(opt =>
+        {
+            opt.Password.RequireNonAlphanumeric = false;
+
+        }).AddEntityFrameworkStores<ApplicationDbContext>();
         return services;
     }
 }
