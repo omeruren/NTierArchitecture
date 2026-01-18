@@ -7,8 +7,10 @@ public sealed class User : IdentityUser<Guid>
     public string FirstName { get; private set; } = default!;
     public string LastName { get; private set; } = default!;
     public string FullName { get; private set; } = default!;
+    public bool IsDeleted { get; set; }
+    public DateTimeOffset? DeletedAt { get; set; }
 
-    public static User Create(string firstName, string lastName, string userName, string fullName, string email)
+    public static User Create(string firstName, string lastName, string userName, string email)
     {
         return new User
         {
@@ -19,7 +21,7 @@ public sealed class User : IdentityUser<Guid>
             Email = email
         };
     }
-    public void Update(string firstName, string lastName, string userName, string fullName, string email)
+    public void Update(string firstName, string lastName, string userName, string email)
     {
 
         FirstName = firstName;
@@ -29,4 +31,9 @@ public sealed class User : IdentityUser<Guid>
         Email = email;
     }
 
+    public void Delete()
+    {
+        IsDeleted = true;
+        DeletedAt = DateTimeOffset.Now;
+    }
 }

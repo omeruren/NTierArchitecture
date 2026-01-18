@@ -22,9 +22,9 @@ builder.Services.AddRateLimiter(x =>
 {
     x.AddFixedWindowLimiter("fixed", cfr =>
     {
-        cfr.PermitLimit = 5;
-        cfr.Window = TimeSpan.FromSeconds(10);
-        cfr.QueueLimit = 3;
+        cfr.PermitLimit = 50;
+        cfr.Window = TimeSpan.FromSeconds(5);
+        cfr.QueueLimit = 50;
         cfr.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
     });
 });
