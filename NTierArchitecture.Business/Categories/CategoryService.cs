@@ -73,6 +73,7 @@ public sealed class CategoryService(ApplicationDbContext _context, IMemoryCache 
         Category? category = await _context.Categories.FindAsync(id, token) ?? throw new ArgumentException("Category not found.");
         _context.Categories.Remove(category);
         await _context.SaveChangesAsync(token);
+        _memoryCache.Remove("categories");
         return "Category Deleted Successfully.";
 
     }

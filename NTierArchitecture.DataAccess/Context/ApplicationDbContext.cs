@@ -15,6 +15,8 @@ public sealed class ApplicationDbContext : IdentityDbContext<User, IdentityRole<
     public DbSet<Category> Categories { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<Order> Orders { get; set; }
+    public DbSet<Role> AppRoles { get; set; }
+    public DbSet<UserRole> AppUserRoles { get; set; }
     #endregion
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

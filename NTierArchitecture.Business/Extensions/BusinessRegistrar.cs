@@ -20,6 +20,8 @@ public static class BusinessRegistrar
         services.AddTransient<UserService>();
         services.AddTransient<AuthService>();
         services.AddTransient<JwtProvider>();
+        services.AddTransient<RoleService>();
+        services.AddTransient<UserRoleService>();
         services.AddValidatorsFromAssembly(typeof(BusinessRegistrar).Assembly);
         return services;
     }
