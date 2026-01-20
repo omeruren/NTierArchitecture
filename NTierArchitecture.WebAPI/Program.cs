@@ -29,6 +29,16 @@ builder.Services.AddRateLimiter(x =>
     });
 });
 
+builder.Services.AddRateLimiter(x =>
+{
+    x.AddFixedWindowLimiter("auth-fixed", cfr =>
+    {
+        cfr.PermitLimit = 5;
+        cfr.Window = TimeSpan.FromMinutes(1);
+        cfr.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+    });
+});
+
 var app = builder.Build();
 
 app.MapOpenApi();

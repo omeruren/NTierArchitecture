@@ -17,6 +17,7 @@ public static class BusinessRegistrar
         services.AddTransient<ProductService>();
         services.AddTransient<OrderService>();
         services.AddTransient<UserService>();
+        services.AddTransient<AuthService>();
         services.AddValidatorsFromAssembly(typeof(BusinessRegistrar).Assembly);
         return services;
     }
