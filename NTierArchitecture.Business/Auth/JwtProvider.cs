@@ -1,5 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using NTierArchitecture.Business.Options;
 using NTierArchitecture.Entity.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -7,18 +8,18 @@ using System.Text;
 
 namespace NTierArchitecture.Business.Auth;
 
-public sealed class JwtProvider(IConfiguration configuration)
+public sealed class JwtProvider(IOptions<JwtOptions> _options)
 {
     public string CreateToken(User user)
     {
-        string secertKey = configuration.GetSection("Jwt:SecretKey").Value!;
+        string secertKey = _options.Value.SecretKey;
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secertKey));
 
         var signinCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512);
 
         JwtSecurityToken jwtSecurityToken = new(
-            issuer: configuration.GetSection("Jwt:Issuer").Value!,
-            audience: configuration.GetSection("Jwt:Audience").Value!,
+            issuer: _options.Value.Issuer,
+            audience: _options.Value.Audience,
             claims: new List<Claim>()
             {
                 new("userId",user.Id.ToString()),
