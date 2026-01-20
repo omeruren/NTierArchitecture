@@ -1,10 +1,12 @@
 
 using Carter;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.IdentityModel.Tokens;
 using NTierArchitecture.Business.Extensions;
 using NTierArchitecture.DataAccess.Extensions;
 using NTierArchitecture.WebAPI;
 using Scalar.AspNetCore;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +41,23 @@ builder.Services.AddRateLimiter(x =>
     });
 });
 
+builder.Services.AddAuthentication().AddJwtBearer(opt =>
+{
+    string secertKey = builder.Configuration.GetSection("Jwt:SecretKey").Value!;
+    var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secertKey));
+    opt.TokenValidationParameters = new()
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateIssuerSigningKey = true,
+        ValidateLifetime = true,
+        ValidIssuer = builder.Configuration.GetSection("Jwt:Issuer").Value!,
+        ValidAudience = builder.Configuration.GetSection("Jwt:Audience").Value!,
+        IssuerSigningKey = securityKey,
+    };
+});
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 app.MapOpenApi();
@@ -58,5 +77,7 @@ app.UseExceptionHandler();
 
 app.UseRateLimiter();
 
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapCarter();
 app.Run();

@@ -2,9 +2,9 @@
 using NTierArchitecture.Entity.Models;
 using TS.Result;
 
-namespace NTierArchitecture.Business.Users;
+namespace NTierArchitecture.Business.Auth;
 
-public sealed class AuthService(UserManager<User> _userManager)
+public sealed class AuthService(UserManager<User> _userManager, JwtProvider jwtProvider)
 {
     public async Task<Result<string>> LoginAsync(string userName, string password, CancellationToken token)
     {
@@ -15,6 +15,6 @@ public sealed class AuthService(UserManager<User> _userManager)
         if (!result)
             throw new Exception("User name or password is incorrect");
 
-        return "token";
+        return jwtProvider.CreateToken(user);
     }
 }

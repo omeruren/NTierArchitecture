@@ -11,7 +11,10 @@ public sealed class OrderModule : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder group)
     {
-        var app = group.MapGroup("/orders").WithTags("Orders").RequireRateLimiting("fixed");
+        var app = group.MapGroup("/orders")
+            .WithTags("Orders")
+            .RequireRateLimiting("fixed")
+            .RequireAuthorization();
 
         // GET ALL
 

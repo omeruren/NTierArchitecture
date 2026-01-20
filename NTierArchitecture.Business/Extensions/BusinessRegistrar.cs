@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using NTierArchitecture.Business.Auth;
 using NTierArchitecture.Business.Categories;
 using NTierArchitecture.Business.Orders;
 using NTierArchitecture.Business.Products;
@@ -18,6 +19,7 @@ public static class BusinessRegistrar
         services.AddTransient<OrderService>();
         services.AddTransient<UserService>();
         services.AddTransient<AuthService>();
+        services.AddTransient<JwtProvider>();
         services.AddValidatorsFromAssembly(typeof(BusinessRegistrar).Assembly);
         return services;
     }

@@ -1,5 +1,5 @@
 ﻿using Carter;
-using NTierArchitecture.Business.Users;
+using NTierArchitecture.Business.Auth;
 using TS.Result;
 
 namespace NTierArchitecture.WebAPI.Modules;
