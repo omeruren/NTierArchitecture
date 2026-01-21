@@ -25,18 +25,39 @@ public sealed class OrderService(ApplicationDbContext _context)
         OrderResponseDto? order = await _context.Orders
             .Where(o => o.Id == id)
             .LeftJoin(_context.Products, o => o.ProductId, o => o.Id, (order, product) => new { order, product })
+            .LeftJoin(_context.Users, o => o.order.CreatedUserId, o => o.Id, (entity, user) => new
+            {
+                entity.order,
+                entity.product,
+                createdUser = user
+            })
+            .LeftJoin(_context.Users, o => o.order.UpdatedUserId, o => o.Id, (entity, user) => new
+            {
+                entity.order,
+                entity.product,
+                entity.createdUser,
+                updatedUser = user
+            })
             .Select(s => new OrderResponseDto
             {
                 Id = s.order.Id,
                 OrderDate = s.order.OrderDate,
                 Quantity = s.order.Quantity,
+
                 ProductId = s.order.ProductId,
                 ProductName = s.product!.Name,
-                CreatedAt = s.product.CreatedAt,
-                UpdatedAt = s.product.UpdatedAt,
-                IsDeleted = s.product.IsDeleted,
-                DeletedAt = s.product.DeletedAt
 
+                CreatedAt = s.order.CreatedAt,
+                CreatedUserId = s.order.CreatedUserId,
+                CreatedUserName = s.createdUser!.FullName,
+
+                UpdatedAt = s.order.UpdatedAt,
+                UpdatedUserId = s.order.UpdatedUserId,
+                UpdatedUserName = (s.order.UpdatedAt == null ? null : s.updatedUser!.FullName)!,
+
+                IsDeleted = s.product.IsDeleted,
+                DeletedAt = s.product.DeletedAt,
+                DeletedUserName = (s.order.DeletedAt == null ? null : s.updatedUser!.FullName)!
             })
             .FirstOrDefaultAsync(token) ?? throw new ArgumentException("Order not found");
 
@@ -46,17 +67,40 @@ public sealed class OrderService(ApplicationDbContext _context)
     {
         return await _context.Orders
             .LeftJoin(_context.Products, o => o.ProductId, o => o.Id, (order, product) => new { order, product })
+            .LeftJoin(_context.Users, o => o.order.CreatedUserId, o => o.Id, (entity, user) => new
+            {
+                entity.order,
+                entity.product,
+                createdUser = user
+            })
+            .LeftJoin(_context.Users, o => o.order.UpdatedUserId, o => o.Id, (entity, user) => new
+            {
+                entity.order,
+                entity.product,
+                entity.createdUser,
+                updatedUser = user
+            })
             .Select(s => new OrderResponseDto
             {
                 Id = s.order.Id,
                 OrderDate = s.order.OrderDate,
                 Quantity = s.order.Quantity,
+
                 ProductId = s.order.ProductId,
                 ProductName = s.product!.Name,
+
+                CreatedUserId = s.order.CreatedUserId,
+                CreatedUserName = s.createdUser!.FullName,
                 CreatedAt = s.product.CreatedAt,
-                UpdatedAt = s.product.UpdatedAt,
+
+                UpdatedUserId = s.order.UpdatedUserId,
+                UpdatedUserName = (s.order.UpdatedAt == null ? null : s.updatedUser!.FullName)!,
+                UpdatedAt = s.order.UpdatedAt,
+
                 IsDeleted = s.product.IsDeleted,
-                DeletedAt = s.product.DeletedAt
+                DeletedAt = s.product.DeletedAt,
+                DeletedUserId = s.order.DeletedUserId,
+                DeletedUserName = (s.order.DeletedAt == null ? null : s.updatedUser!.FullName)!
             })
             .OrderBy(o => o.OrderDate)
             .Pagination(request, token);

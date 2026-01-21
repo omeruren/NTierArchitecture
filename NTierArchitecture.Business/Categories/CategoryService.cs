@@ -26,20 +26,59 @@ public sealed class CategoryService(ApplicationDbContext _context, IMemoryCache 
         return "Category Created Successfully.";
     }
 
-    public async Task<Result<Category>> GetAsync(Guid id, CancellationToken token)
+    public async Task<Result<CategoryResultDto>> GetAsync(Guid id, CancellationToken token)
     {
-        Category? category = await _context.Categories.FindAsync(id, token) ?? throw new ArgumentException("Category not found.");
+        CategoryResultDto? category = await _context.Categories
+            .Where(c => c.Id == id)
+            .LeftJoin(_context.Users, m => m.CreatedUserId, m => m.Id, (category, user) => new { category, user })
+            .Select(c => new CategoryResultDto
+            {
+                Id = c.category.Id,
+                Name = c.category.Name,
+
+                CreatedAt = c.category.CreatedAt,
+                CreatedUserId = c.category.CreatedUserId,
+                CreatedUserName = c.user!.FullName,
+
+                UpdatedAt = c.category.UpdatedAt,
+                UpdatedUserId = c.category.UpdatedUserId,
+                UpdatedUserName = (c.category.UpdatedAt == null ? null : c.user!.FullName)!,
+
+                IsDeleted = c.category.IsDeleted,
+                DeletedAt = c.category.DeletedAt,
+                DeletedUserName = (c.category.DeletedAt == null ? null : c.user.FullName)!
+
+            })
+            .FirstOrDefaultAsync(token) ?? throw new ArgumentException("Category not found.");
 
         return category;
     }
 
-    public async Task<Result<PaginationResponseDto<Category>>> GetAllAsync(PaginationRequestDto request, CancellationToken token)
+    public async Task<Result<PaginationResponseDto<CategoryResultDto>>> GetAllAsync(PaginationRequestDto request, CancellationToken token)
     {
-        var categories = _memoryCache.Get<PaginationResponseDto<Category>>("categories");
+        var categories = _memoryCache.Get<PaginationResponseDto<CategoryResultDto>>("categories");
 
         if (categories is null)
         {
             categories = await _context.Categories
+                .LeftJoin(_context.Users, m => m.CreatedUserId, m => m.Id, (category, user) => new { category, user })
+                .Select(c => new CategoryResultDto
+                {
+                    Id = c.category.Id,
+                    Name = c.category.Name,
+
+                    CreatedAt = c.category.CreatedAt,
+                    CreatedUserId = c.category.CreatedUserId,
+                    CreatedUserName = c.user!.FullName,
+
+                    UpdatedAt = c.category.UpdatedAt,
+                    UpdatedUserId = c.category.UpdatedUserId,
+                    UpdatedUserName = (c.category.UpdatedAt == null ? null : c.user!.FullName)!,
+
+                    IsDeleted = c.category.IsDeleted,
+                    DeletedAt = c.category.DeletedAt,
+                    DeletedUserName = (c.category.DeletedAt == null ? null : c.user.FullName)!
+                })
                      .OrderBy(c => c.Name).Pagination(request, token);
 
             _memoryCache.Set("categories", categories);

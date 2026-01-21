@@ -1,8 +1,8 @@
-﻿using NTierArchitecture.Entity.Abstractions;
+﻿using NTierArchitecture.Entity.Dtos.Abstract;
 
 namespace NTierArchitecture.Entity.Dtos.Orders;
 
-public class OrderResponseDto : AbstractEntity
+public class OrderResponseDto : AbstractEntityDto
 {
     public DateTimeOffset OrderDate { get; set; }
     public int Quantity { get; set; }

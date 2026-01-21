@@ -28,8 +28,8 @@ public sealed class ProductService(ApplicationDbContext _context)
         ProductResultDto? product = await _context.Products
              .Where(p => p.Id == id)
              .LeftJoin(_context.Categories, m => m.CategoryId, m => m.Id, (product, category) => new { product, category })
-             .LeftJoin(_context.Users, m => m.product.CreatedUserId, m => m.Id, (entity, user) => new { product = entity.product, category = entity.category, createdUser = user })
-             .LeftJoin(_context.Users, m => m.product.UpdatedUserId, m => m.Id, (entity, user) => new { product = entity.product, category = entity.category, createdUser = entity.createdUser, updatedUser = user })
+             .LeftJoin(_context.Users, m => m.product.CreatedUserId, m => m.Id, (entity, user) => new { entity.product, entity.category, createdUser = user })
+             .LeftJoin(_context.Users, m => m.product.UpdatedUserId, m => m.Id, (entity, user) => new { entity.product, entity.category, entity.createdUser, updatedUser = user })
              .Select(s => new ProductResultDto
              {
                  Id = s.product.Id,
@@ -58,15 +58,15 @@ public sealed class ProductService(ApplicationDbContext _context)
              .LeftJoin(_context.Categories, p => p.CategoryId, p => p.Id, (product, category) => new { product, category })
              .LeftJoin(_context.Users, m => m.product.CreatedUserId, m => m.Id, (entity, user) => new
              {
-                 product = entity.product,
-                 category = entity.category,
+                 entity.product,
+                 entity.category,
                  createdUser = user
              })
              .LeftJoin(_context.Users, m => m.product.UpdatedUserId, m => m.Id, (entity, user) => new
              {
-                 product = entity.product,
-                 category = entity.category,
-                 createdUser = entity.createdUser,
+                 entity.product,
+                 entity.category,
+                 entity.createdUser,
                  updatedUser = user
              })
              .Select(s => new ProductResultDto
@@ -83,12 +83,12 @@ public sealed class ProductService(ApplicationDbContext _context)
 
                  UpdatedAt = s.product.UpdatedAt,
                  UpdatedUserId = s.product.UpdatedUserId,
-                 UpdatedUserName = s.product.UpdatedAt == null ? null : s.updatedUser!.FullName,
+                 UpdatedUserName = (s.product.UpdatedAt == null ? null : s.updatedUser!.FullName)!,
 
                  IsDeleted = s.product.IsDeleted,
                  DeletedAt = s.product.DeletedAt,
                  DeletedUserId = s.product.DeletedUserId,
-                 DeletedUserName = s.product.DeletedAt == null ? null : s.updatedUser.FullName
+                 DeletedUserName = (s.product.DeletedAt == null ? null : s.updatedUser!.FullName)!
              })
              .OrderBy(p => p.Name)
              .Pagination(request, token);
