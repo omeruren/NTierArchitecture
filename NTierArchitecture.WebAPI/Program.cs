@@ -9,6 +9,8 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddDataAccess(builder.Configuration).AddBusiness();
 builder.Services.AddCarter();
 builder.Services.AddOpenApi();

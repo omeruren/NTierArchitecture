@@ -1,15 +1,20 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using NTierArchitecture.Entity.Abstractions;
 using NTierArchitecture.Entity.Models;
+using System.Security.Claims;
 
 namespace NTierArchitecture.DataAccess.Context;
 
 public sealed class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
 {
-    public ApplicationDbContext(DbContextOptions options) : base(options)
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public ApplicationDbContext(DbContextOptions options, IHttpContextAccessor httpContextAccessor) : base(options)
     {
+        this._httpContextAccessor = httpContextAccessor;
     }
     #region Models
     public DbSet<Category> Categories { get; set; }
@@ -38,14 +43,18 @@ public sealed class ApplicationDbContext : IdentityDbContext<User, IdentityRole<
 
         foreach (var entry in entries)
         {
+            var userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("user not found");
+
             if (entry.State == EntityState.Added)
             {
                 entry.Property(p => p.CreatedAt).CurrentValue = DateTimeOffset.Now;
+                entry.Property(p => p.CreatedUserId).CurrentValue = Guid.Parse(userId);
 
             }
             else if (entry.State == EntityState.Modified)
             {
                 entry.Property(p => p.UpdatedAt).CurrentValue = DateTimeOffset.Now;
+                entry.Property(p => p.UpdatedUserId).CurrentValue = Guid.Parse(userId);
 
             }
             else if (entry.State == EntityState.Deleted)
@@ -55,6 +64,7 @@ public sealed class ApplicationDbContext : IdentityDbContext<User, IdentityRole<
                     entry.Property(p => p.DeletedAt).CurrentValue = DateTimeOffset.Now;
                     entry.Property(p => p.IsDeleted).CurrentValue = true;
                     entry.State = EntityState.Modified;
+                    entry.Property(p => p.DeletedUserId).CurrentValue = Guid.Parse(userId);
                 }
 
             }
