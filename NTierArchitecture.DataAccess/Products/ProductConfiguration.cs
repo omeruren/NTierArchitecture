@@ -10,5 +10,6 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
     {
         builder.HasIndex(p => p.Name).IsUnique();
         builder.Property(p => p.UnitPrice).HasColumnType("money");
+        builder.HasQueryFilter(x => !x.IsDeleted);
     }
 }

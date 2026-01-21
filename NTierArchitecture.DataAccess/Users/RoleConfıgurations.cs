@@ -9,6 +9,7 @@ internal sealed class RoleConfıgurations : IEntityTypeConfiguration<Role>
     public void Configure(EntityTypeBuilder<Role> builder)
     {
         builder.HasIndex(r => r.Name).IsUnique();
+        builder.HasQueryFilter(x => !x.IsDeleted);
     }
 }
 internal sealed class UserRoleConfıgurations : IEntityTypeConfiguration<UserRole>
