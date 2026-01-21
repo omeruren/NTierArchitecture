@@ -44,7 +44,19 @@ builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 
 builder.Services.ConfigureOptions<JwtOptionsSetup>();
 builder.Services.AddAuthentication().AddJwtBearer();
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(x =>
+{
+    //x.AddPolicy("Categories 1", cfr =>
+    //{
+    //    cfr.RequireRole("CategoryCreate");
+    //    cfr.RequireRole("CategoryUpdate");
+    //    cfr.RequireRole("CategoryDelete");
+    //});
+    x.AddPolicy("Admin", cfr =>
+    {
+        cfr.RequireRole("Admin");
+    });
+});
 
 var app = builder.Build();
 

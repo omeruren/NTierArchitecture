@@ -10,23 +10,29 @@ namespace NTierArchitecture.Business.Auth;
 
 public sealed class JwtProvider(IOptions<JwtOptions> _options)
 {
-    public string CreateToken(User user)
+    public string CreateToken(User user, List<string> roles)
     {
         string secertKey = _options.Value.SecretKey;
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secertKey));
 
         var signinCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512);
 
+        var claims = new List<Claim>()
+        {
+          new("userId",user.Id.ToString()),
+          new("userName",user.UserName!),
+          new("fullName",user.FullName),
+          new("email",user.Email!),
+        };
+        foreach (var role in roles)
+        {
+            var claim = new Claim(ClaimTypes.Role, role);
+            claims.Add(claim);
+        }
         JwtSecurityToken jwtSecurityToken = new(
+            claims: claims,
             issuer: _options.Value.Issuer,
             audience: _options.Value.Audience,
-            claims: new List<Claim>()
-            {
-                new("userId",user.Id.ToString()),
-                new("userName",user.UserName!),
-                new("fullName",user.FullName),
-                new("email",user.Email!)
-            },
             notBefore: DateTime.Now,
             expires: DateTime.Now.AddHours(1),
             signingCredentials: signinCredentials

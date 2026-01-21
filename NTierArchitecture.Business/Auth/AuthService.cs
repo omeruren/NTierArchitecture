@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using NTierArchitecture.DataAccess.Context;
 using NTierArchitecture.Entity.Models;
 using TS.Result;
 
 namespace NTierArchitecture.Business.Auth;
 
-public sealed class AuthService(UserManager<User> _userManager, JwtProvider jwtProvider)
+public sealed class AuthService(UserManager<User> _userManager, JwtProvider jwtProvider, ApplicationDbContext _context)
 {
     public async Task<Result<string>> LoginAsync(string userName, string password, CancellationToken token)
     {
@@ -15,6 +17,12 @@ public sealed class AuthService(UserManager<User> _userManager, JwtProvider jwtP
         if (!result)
             throw new Exception("User name or password is incorrect");
 
-        return jwtProvider.CreateToken(user);
+        var roles = await _context.AppUserRoles
+            .Where(u => u.UserId == user.Id)
+            .LeftJoin(_context.AppRoles, m => m.RoleId, m => m.Id, (userRole, role) => role)
+            .Select(s => s!.Name)
+            .ToListAsync(token);
+
+        return jwtProvider.CreateToken(user, roles!);
     }
 }

@@ -15,7 +15,7 @@ public sealed class CategoryModule : ICarterModule
         var app = group.MapGroup("/categories")
             .WithTags("Categories")
             .RequireRateLimiting("fixed")
-            .RequireAuthorization();
+            .RequireAuthorization("Admin");
 
         // GET ALL
         app.MapGet(string.Empty, async (
