@@ -25,22 +25,30 @@ public sealed class ProductService(ApplicationDbContext _context)
 
     public async Task<Result<ProductResultDto>> GetAsync(Guid id, CancellationToken token)
     {
-        ProductResultDto? product = await _context.Products.
-            Where(p => p.Id == id)
-            .LeftJoin(_context.Categories, p => p.CategoryId, p => p.Id, (product, category) => new { product, category })
-            .Select(s => new ProductResultDto
-            {
-                Id = s.product.Id,
-                Name = s.product.Name,
-                CategoryId = s.product.CategoryId,
-                CategoryName = s.category!.Name,
-                UnitPrice = s.product.UnitPrice,
-                CreatedAt = s.product.CreatedAt,
-                UpdatedAt = s.product.UpdatedAt,
-                IsDeleted = s.product.IsDeleted,
-                DeletedAt = s.product.DeletedAt,
-            })
-            .FirstOrDefaultAsync(token) ?? throw new ArgumentException("Product not found");
+        ProductResultDto? product = await _context.Products
+             .Where(p => p.Id == id)
+             .LeftJoin(_context.Categories, m => m.CategoryId, m => m.Id, (product, category) => new { product, category })
+             .LeftJoin(_context.Users, m => m.product.CreatedUserId, m => m.Id, (entity, user) => new { product = entity.product, category = entity.category, createdUser = user })
+             .LeftJoin(_context.Users, m => m.product.UpdatedUserId, m => m.Id, (entity, user) => new { product = entity.product, category = entity.category, createdUser = entity.createdUser, updatedUser = user })
+             .Select(s => new ProductResultDto
+             {
+                 Id = s.product.Id,
+                 Name = s.product.Name,
+                 CategoryId = s.product.CategoryId,
+                 CategoryName = s.category!.Name,
+                 UnitPrice = s.product.UnitPrice,
+                 CreatedAt = s.product.CreatedAt,
+                 CreatedUserId = s.product.CreatedUserId,
+                 CreatedUserName = s.createdUser!.FullName,
+                 UpdatedAt = s.product.UpdatedAt,
+                 UpdatedUserId = s.product.UpdatedUserId,
+                 UpdatedUserName = (s.product.UpdatedAt == null ? null : s.updatedUser!.FullName)!,
+                 IsDeleted = s.product.IsDeleted,
+                 DeletedAt = s.product.DeletedAt,
+                 DeletedUserId = s.product.DeletedUserId,
+                 DeletedUserName = ""
+             })
+             .FirstOrDefaultAsync(token) ?? throw new ArgumentException("Product not found");
         return product;
     }
     public async Task<Result<PaginationResponseDto<ProductResultDto>>> GetAllAsync(PaginationRequestDto request, CancellationToken token)
@@ -48,6 +56,19 @@ public sealed class ProductService(ApplicationDbContext _context)
         return await _context.Products
              .Where(p => p.Name.Contains(request.Search))
              .LeftJoin(_context.Categories, p => p.CategoryId, p => p.Id, (product, category) => new { product, category })
+             .LeftJoin(_context.Users, m => m.product.CreatedUserId, m => m.Id, (entity, user) => new
+             {
+                 product = entity.product,
+                 category = entity.category,
+                 createdUser = user
+             })
+             .LeftJoin(_context.Users, m => m.product.UpdatedUserId, m => m.Id, (entity, user) => new
+             {
+                 product = entity.product,
+                 category = entity.category,
+                 createdUser = entity.createdUser,
+                 updatedUser = user
+             })
              .Select(s => new ProductResultDto
              {
                  Id = s.product.Id,
@@ -55,10 +76,19 @@ public sealed class ProductService(ApplicationDbContext _context)
                  CategoryName = s.category!.Name,
                  CategoryId = s.product.CategoryId,
                  UnitPrice = s.product.UnitPrice,
+
                  CreatedAt = s.product.CreatedAt,
+                 CreatedUserId = s.product.CreatedUserId,
+                 CreatedUserName = s.createdUser!.FullName,
+
                  UpdatedAt = s.product.UpdatedAt,
+                 UpdatedUserId = s.product.UpdatedUserId,
+                 UpdatedUserName = s.product.UpdatedAt == null ? null : s.updatedUser!.FullName,
+
                  IsDeleted = s.product.IsDeleted,
-                 DeletedAt = s.product.DeletedAt
+                 DeletedAt = s.product.DeletedAt,
+                 DeletedUserId = s.product.DeletedUserId,
+                 DeletedUserName = s.product.DeletedAt == null ? null : s.updatedUser.FullName
              })
              .OrderBy(p => p.Name)
              .Pagination(request, token);

@@ -1,8 +1,8 @@
-﻿using NTierArchitecture.Entity.Abstractions;
+﻿using NTierArchitecture.Entity.Dtos.Abstract;
 
 namespace NTierArchitecture.Entity.Dtos.Products;
 
-public sealed class ProductResultDto : AbstractEntity
+public sealed class ProductResultDto : AbstractEntityDto
 {
     public string Name { get; set; } = default!;
     public decimal UnitPrice { get; set; }

@@ -50,8 +50,8 @@ public class ProductModule : ICarterModule
             ProductCreateDto request,
             CancellationToken token) =>
         {
-            await _service.CreateAsync(request, token);
-            return Results.Created();
+            var result = await _service.CreateAsync(request, token);
+            return Results.Ok(result);
         }).Produces<Result<string>>().AddEndpointFilter<ValidationFilter<ProductCreateDto>>();
 
         // PUT
@@ -61,8 +61,8 @@ public class ProductModule : ICarterModule
             ProductUpdateDto request,
             CancellationToken token) =>
         {
-            await _service.UpdateAsync(request, token);
-            return Results.Ok();
+            var result = await _service.UpdateAsync(request, token);
+            return Results.Ok(result);
         }).Produces<Result<string>>().AddEndpointFilter<ValidationFilter<ProductUpdateDto>>();
 
         // DELETE
@@ -72,8 +72,8 @@ public class ProductModule : ICarterModule
             ProductService _service,
             CancellationToken token) =>
         {
-            await _service.DeleteAsync(id, token);
-            return Results.Ok();
+            var result = await _service.DeleteAsync(id, token);
+            return Results.Ok(result);
         }).Produces<Result<string>>();
 
     }
