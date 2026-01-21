@@ -15,7 +15,7 @@ public sealed class CategoryModule : ICarterModule
         var app = group.MapGroup("/categories")
             .WithTags("Categories")
             .RequireRateLimiting("fixed")
-            .RequireAuthorization("Admin");
+            .RequireAuthorization();
 
         // GET ALL
         app.MapGet(string.Empty, async (
@@ -28,7 +28,7 @@ public sealed class CategoryModule : ICarterModule
             var paginationResponse = new PaginationRequestDto(pageNumber, pageSize, search);
             var result = await _service.GetAllAsync(paginationResponse, token);
             return Results.Ok(result);
-        }).Produces<Result<List<Category>>>();
+        }).Produces<Result<List<Category>>>().RequireRoleFromDb("Admin");
 
         // GET BY ID
 
