@@ -19,7 +19,7 @@ Katmanlar birbirine **yalnızca abstraction (interface / contract)** üzerinden 
 
 ## ✨ Kullanılan Teknolojiler
 
-* **.NET 8 / ASP.NET Core Minimal API**
+* **.NET 10 / ASP.NET Core Minimal API**
 * **Entity Framework Core**
 * **Microsoft Identity**
 * **JWT (JSON Web Token)** Authentication
